@@ -17,7 +17,7 @@ function sendHttpRequest(method, url, data) {
   //   if(xhr.status >= 200 && xhr.status < 300) {
   //     resolve(xhr.response);
   //   } else {
-          // xhr.response;
+  // xhr.response;
   //     reject(new Error('Something went wrong!'));
   //   }
   //   // const listOfPosts = JSON.parse(xhr.response);
@@ -39,14 +39,17 @@ function sendHttpRequest(method, url, data) {
     //   'Content-Type': 'application/json',
     // },
   })
-    .then(response => {
-      if(response.status >= 200 && response.status < 300) {
+    .then((response) => {
+      if (response.status >= 200 && response.status < 300) {
         return response.json();
       } else {
-        return response.json(),then(errData => {
-          console.log(errData);
-          throw new Error('Something went wrong - server-side');
-        });
+        return (
+          response.json(),
+          then((errData) => {
+            console.log(errData);
+            throw new Error('Something went wrong - server-side');
+          })
+        );
       }
     })
     .catch((error) => {
@@ -57,11 +60,11 @@ function sendHttpRequest(method, url, data) {
 
 async function fetchPosts() {
   try {
-    const responseData = await sendHttpRequest(
+    const response = await axios.get(
       'GET',
       'https://jsonplaceholder.typicode.com/posts'
     );
-    const listOfPosts = xhr.response;
+    const listOfPosts = response.data;
     for (const post of listOfPosts) {
       const postEl = document.importNode(postTemplate.content, true);
       postEl.querySelector('h2').textContent = post.title.toUpperCase();
@@ -71,6 +74,7 @@ async function fetchPosts() {
     }
   } catch (error) {
     alert(error.message);
+    console.log(error.response);
   }
 }
 
@@ -87,7 +91,11 @@ async function createPost(title, content) {
   // fd.append('body', content);
   fd.append('userId', userId);
 
-  sendHttpRequest('POST', 'https://jsonplaceholder.typicode.com/posts', fd);
+  const response = axios.post(
+    'https://jsonplaceholder.typicode.com/posts',
+    post
+  );
+  console.log(response);
 }
 
 fetchButton.addEventListener('click', fetchPosts);
@@ -102,10 +110,6 @@ form.addEventListener('submit', (event) => {
 postList.addEventListener('click', (event) => {
   if (event.target.tagName === 'BUTTON') {
     const postId = event.target.closest('li').id;
-    console.log(postId);
-    sendHttpRequest(
-      'DELETE',
-      `https://jsonplaceholder.typicode.com/posts/${postId}`
-    );
+    axios.delete(`https://jsonplaceholder.typicode.com/posts/${postId}`);
   }
 });
